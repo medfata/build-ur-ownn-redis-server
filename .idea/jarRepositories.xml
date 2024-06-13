@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteRepositoriesConfiguration">
+    <remote-repository>
+      <option name="id" value="CTS-snapshots@Local" />
+      <option name="name" value="CTS-snapshots@Local" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="maven-central" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="colombo-feed" />
+      <option name="name" value="colombo-feed" />
+      <option name="url" value="https://ferrovialvso.pkgs.visualstudio.com/15679252-fcf3-4baa-971b-8a0db340ef65/_packaging/colombo-feed/maven/v1" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="cts-architecture" />
+      <option name="name" value="cts-architecture" />
+      <option name="url" value="https://ferrovialvso.pkgs.visualstudio.com/e4362dc1-04e7-4dfe-9f15-ef2b34f4599e/_packaging/cts-architecture/maven/v1" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Maven Central repository" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="jboss.community" />
+      <option name="name" value="JBoss Community repository" />
+      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="confluent" />
+      <option name="name" value="confluent" />
+      <option name="url" value="http://packages.confluent.io/maven/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="CTS-feed" />
+      <option name="name" value="CTS-feed" />
+      <option name="url" value="https://pkgs.dev.azure.com/cintratollservices/_packaging/CTS-feed/maven/v1" />
+    </remote-repository>
+  </component>
+</project>
