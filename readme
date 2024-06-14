@@ -1,0 +1,49 @@
+# Lite Redis Server Project
+
+## Overview
+This project is a lightweight Redis server implemented in Java. It supports basic Redis commands like `SET` and `GET` and allows clients to connect using the `redis-cli` tool. The core functionality includes developing a RESP (REdis Serialization Protocol) serializer and deserializer to handle communication with the client.
+
+## Features
+- Implementation of a basic Redis server in Java.
+- Supports basic Redis commands:
+  - `SET key value` - Store the value at the specified key.
+  - `GET key` - Retrieve the value stored at the specified key.
+- RESP (REdis Serialization Protocol) serializer and deserializer.
+- Clients can connect using the `redis-cli` tool.
+
+## Project Structure
+
+├── src/
+│ ├── main/
+│ │ ├── java/
+│ │ │ └── com/
+│ │ │ └── liteserver/
+│ │ │ ├── LiteRedisServer.java
+│ │ │ ├── RespSerializer.java
+│ │ │ ├── RespDeserializer.java
+│ │ │ └── CommandHandler.java
+│ ├── test/
+│ │ ├── java/
+│ │ │ └── com/
+│ │ │ └── liteserver/
+│ │ │ ├── LiteRedisServerTest.java
+│ │ │ ├── RespSerializerTest.java
+│ │ │ ├── RespDeserializerTest.java
+│ │ │ └── CommandHandlerTest.java
+
+
+## Installation
+
+To install the dependencies and build the project, run the following command:
+
+```bash
+mvn clean install
+```
+
+## Running Unit tests
+
+To run the unit tests, use the following command:
+
+```bash
+mvn test
+```
