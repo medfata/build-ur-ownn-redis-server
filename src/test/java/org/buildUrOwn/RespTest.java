@@ -22,15 +22,17 @@ public class RespTest extends TestCase {
     private RespDeserialiser respDeserialiser = new RespDeserializer();
 
     public void testValidDeserSimpleString(){
-        String strtoDeser = "+hello world\r\n";
-        String output = String.valueOf(this.respDeserialiser.deserialise(strtoDeser));
-        assertEquals(output, "hello world");
+        assertEquals(
+            "hello world", 
+            this.respDeserialiser.deserialise("+hello world\r\n")
+        );
     }
 
     public void testInvalidDeserSimpleString(){
-        String strtoDeser = "+test\ntest\r\n";
-        String output =  String.valueOf(this.respDeserialiser.deserialise(strtoDeser));
-        assertEquals(output, "-Error Simple string contains CR or LF characters\r\n");
+        assertEquals(
+            "-Error Simple string contains CR or LF characters\r\n",
+            this.respDeserialiser.deserialise("+test\ntest\r\n")
+        );
     }
 
     public void testValidDeserNull(){
@@ -40,24 +42,36 @@ public class RespTest extends TestCase {
     }
 
     public void testInvalidDeserNull(){
-        String strtoDeser = "_1s\r\n";
-        Object output = this.respDeserialiser.deserialise(strtoDeser);
-        assertEquals(output, "-Error Not Valid Null\r\n");
+        assertEquals(
+            "-Error Not Valid Null\r\n", 
+            this.respDeserialiser.deserialise("_1s\r\n")
+        );
     }
 
     public void testValidDeserInteger(){
-        String strtoDeser = ":200\r\n";
-        Object output = this.respDeserialiser.deserialise(strtoDeser);
-        assertEquals(output, Integer.valueOf(200));
-        String strtoDeser1 = ":-200\r\n";
-        Object output1 = this.respDeserialiser.deserialise(strtoDeser1);
-        assertEquals(output1, Integer.valueOf(-200));
+        assertEquals(Integer.valueOf(200),this.respDeserialiser.deserialise(":200\r\n"));
+        assertEquals(Integer.valueOf(-200),this.respDeserialiser.deserialise(":-200\r\n"));
     }
 
     public void testInvalidDeserInterger(){
         String strToDeser = ":84rg\r\n";
         Object output = this.respDeserialiser.deserialise(strToDeser);
-        System.out.println("outpur: "+output);
-        assertEquals(output, "-Error Not Valid Integer\r\n");
+        assertEquals("-Error Not Valid Integer\r\n", output);
+    }
+
+    public void testValidDeserBulkString(){
+        assertEquals("hello", this.respDeserialiser.deserialise("$5\r\nhello\r\n"));
+        assertEquals("", this.respDeserialiser.deserialise("$0\r\n\r\n"));
+    }
+
+    public void testInValidDeserBulkString(){
+        assertEquals(
+            "-Error Malformed bulk string: Missing CRLF after length\r\n",
+            this.respDeserialiser.deserialise("$5hello\r\n")
+        );
+        assertEquals(
+            "-Error Invalid bulk string length\r\n",
+            this.respDeserialiser.deserialise("$12k\r\ntest\r\n")
+        );
     }
 }

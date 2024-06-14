@@ -64,10 +64,40 @@ public class RespDeserializer implements RespDeserialiser {
        }
     }
 
-    public String[] deSerializeBulkString(String input) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deSerializeBulkString'");
+    @Override
+    public String deSerializeBulkString(String input) {
+        if (input.charAt(0) != '$') {
+            throw new IllegalArgumentException("Not a bulk string");
+        }
+    
+        int lengthCrlfIndex = input.indexOf("\r\n");
+        int endCrlnfIndex = input.indexOf("\r\n", lengthCrlfIndex + 2);
+        if (endCrlnfIndex != (input.length() - 2)) {
+            throw new IllegalArgumentException("Malformed bulk string: Missing CRLF after length");
+        }
+    
+        int length;
+        try {
+            length = Integer.parseInt(input.substring(1, lengthCrlfIndex));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid bulk string length", e);
+        }
+
+        if (length == -1) {
+            return null; // Null bulk string
+        }
+    
+        int startOfString = lengthCrlfIndex + 2;
+        int endOfString = startOfString + length;
+    
+        if (endOfString + 2 > input.length() || !input.substring(endOfString, endOfString + 2).equals("\r\n")) {
+            throw new IllegalArgumentException("Malformed bulk string: Content length mismatch or missing final CRLF");
+        }
+    
+        return input.substring(startOfString, endOfString);
     }
+    
+
 
     public String[] deSerialiseArray(String input) {
         // TODO Auto-generated method stub
