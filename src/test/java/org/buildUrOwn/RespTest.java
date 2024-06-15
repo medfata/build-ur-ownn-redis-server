@@ -3,6 +3,7 @@ package org.buildUrOwn;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import java.util.Arrays;
 import org.buildUrOwn.respSerialiser.RespDeserialiser;
 import org.buildUrOwn.respSerialiser.RespSerialiser;
 import org.buildUrOwn.respSerialiser.impl.RespSerializer;
@@ -73,5 +74,31 @@ public class RespTest extends TestCase {
             "-Error Invalid bulk string length\r\n",
             this.respDeserialiser.deserialise("$12k\r\ntest\r\n")
         );
+    }
+
+    public void testValidDeserArray(){
+        assertEquals(
+            Arrays.toString(new String[]{"ping"}),
+            Arrays.toString((String[]) this.respDeserialiser.deserialise("*1\r\n$4\r\nping\r\n"))
+        );
+        assertEquals(
+            Arrays.toString(new String[]{"echo", "hello world"}),
+            Arrays.toString((String[]) this.respDeserialiser.deserialise("*2\r\n$4\r\necho\r\n$11\r\nhello world\r\n"))
+        );
+        assertEquals(
+            Arrays.toString(new String[]{"get", "key"}),
+            Arrays.toString((String[]) this.respDeserialiser.deserialise("*2\r\n$3\r\nget\r\n$3\r\nkey\r\n"))
+        );
+    }
+
+    public void testInvalidDeserArray(){
+        assertEquals(
+            "-Error Invalid array length\r\n",
+            this.respDeserialiser.deserialise("*2ks\r\n$4\r\nping\r\n")
+        );
+    }
+
+    public void testValidSeriaSimpleString(){
+        assertEquals("+test simple string\r\n", this.respSerialiser.serialise("test simple string"));
     }
 }
