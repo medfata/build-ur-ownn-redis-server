@@ -7,8 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.stream.Collectors;
-
+import java.net.SocketTimeoutException;
 import org.buildUrOwn.respSerialiser.RespDeserialiser;
 import org.buildUrOwn.respSerialiser.RespSerialiser;
 import org.buildUrOwn.respSerialiser.impl.RespDeserializer;
@@ -45,15 +44,36 @@ public class RedisServer{
     }
 
     private static void handleClientReq(Socket clientSocket) throws IOException{
+        clientSocket.setSoTimeout(500);
         try(BufferedInputStream in = new BufferedInputStream(clientSocket.getInputStream());
             BufferedOutputStream out = new BufferedOutputStream(clientSocket.getOutputStream());){
                 System.out.println("before reader");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                String line = reader.readLine();
-                String rawCmd = "*1\r\n$4\r\nPING\r\n";
-               
+                StringBuilder rawCmdBuilder = new StringBuilder();
+                String line;
+                try{
+                    while ((line = reader.readLine()) != null) {
+                        rawCmdBuilder.append(line).append("\r\n");
+                    }    
+                }catch(SocketTimeoutException e){
+                    System.out.println("socket timed out Exception!");
+                }
+                String rawCmd = rawCmdBuilder.toString();
+                System.out.println("raw cmd: "+rawCmd);
+                Object  deserializedCmd = respDeserialiser.deserialise(rawCmd);
+                String deserializedCmdStr = String.join(" ", ((String[]) deserializedCmd));
+                System.out.println("formatted Cmd: "+ deserializedCmdStr);
+                String output = "";
+                if(deserializedCmdStr.equals("PING")){
+                    output = "PONG";
+                }
+                out.write(respSerialiser.serialise((Object) output).getBytes());
+                out.flush();
+                return;
         }finally{
             clientSocket.close();
         }
     }
+
+    
 }

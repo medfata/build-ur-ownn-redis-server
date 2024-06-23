@@ -1,5 +1,5 @@
 package org.buildUrOwn.redisCommandHandler;
 
-public class RedisCommandHandler {
+public interface RedisCommandHandler {
     
 }
