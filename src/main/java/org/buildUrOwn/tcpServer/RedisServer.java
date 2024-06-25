@@ -8,6 +8,11 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.Arrays;
+
+import org.buildUrOwn.redisCommandHandler.RedisCommand;
+import org.buildUrOwn.redisCommandHandler.impl.EchoCommand;
+import org.buildUrOwn.redisCommandHandler.impl.PingCommand;
 import org.buildUrOwn.respSerialiser.RespDeserialiser;
 import org.buildUrOwn.respSerialiser.RespSerialiser;
 import org.buildUrOwn.respSerialiser.impl.RespDeserializer;
@@ -21,16 +26,17 @@ public class RedisServer{
         try(ServerSocket serverSocket = new ServerSocket(6379)){
             System.out.println("Server started on port 6379");
             while(true){
-                Socket clienSocket = serverSocket.accept();
+                Socket clientSocket = serverSocket.accept();
+                clientSocket.setSoTimeout(500);
                 new Thread(() -> {
                     long threadId = Thread.currentThread().getId();
                     try {
-                        handleClientReq(clienSocket);
+                        handleClientReq(clientSocket);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
                         try {
-                            clienSocket.close();
+                            clientSocket.close();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -44,10 +50,8 @@ public class RedisServer{
     }
 
     private static void handleClientReq(Socket clientSocket) throws IOException{
-        clientSocket.setSoTimeout(500);
         try(BufferedInputStream in = new BufferedInputStream(clientSocket.getInputStream());
             BufferedOutputStream out = new BufferedOutputStream(clientSocket.getOutputStream());){
-                System.out.println("before reader");
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                 StringBuilder rawCmdBuilder = new StringBuilder();
                 String line;
@@ -61,12 +65,11 @@ public class RedisServer{
                 String rawCmd = rawCmdBuilder.toString();
                 System.out.println("raw cmd: "+rawCmd);
                 Object  deserializedCmd = respDeserialiser.deserialise(rawCmd);
-                String deserializedCmdStr = String.join(" ", ((String[]) deserializedCmd));
-                System.out.println("formatted Cmd: "+ deserializedCmdStr);
-                String output = "";
-                if(deserializedCmdStr.equals("PING")){
-                    output = "PONG";
-                }
+                String[] deserializedCmdParts = ((String[]) deserializedCmd);
+                String deserializedCmdStr = deserializedCmdParts[0];
+                RedisCommand redisCommandHandler = handleRedisCommand(deserializedCmdStr);
+                String[] commandArgs = Arrays.copyOfRange(deserializedCmdParts, 1, deserializedCmdParts.length);
+                String output = redisCommandHandler != null ?  redisCommandHandler.execute(commandArgs) : "-Error invalid redis command";
                 out.write(respSerialiser.serialise((Object) output).getBytes());
                 out.flush();
                 return;
@@ -75,5 +78,13 @@ public class RedisServer{
         }
     }
 
+    private static RedisCommand handleRedisCommand(String command){
+        if(command.equals("PING")){
+            return new PingCommand();
+        }else if(command.equals("ECHO")){
+            return new EchoCommand();
+        }
+        return null;
+    }
     
 }
