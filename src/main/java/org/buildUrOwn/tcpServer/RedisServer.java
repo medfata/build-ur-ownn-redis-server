@@ -12,6 +12,7 @@ import java.util.Arrays;
 
 import org.buildUrOwn.redisCommandHandler.RedisCommand;
 import org.buildUrOwn.redisCommandHandler.RedisMap;
+import org.buildUrOwn.redisCommandHandler.impl.ConfigCommand;
 import org.buildUrOwn.redisCommandHandler.impl.EchoCommand;
 import org.buildUrOwn.redisCommandHandler.impl.GetCommand;
 import org.buildUrOwn.redisCommandHandler.impl.PingCommand;
@@ -32,7 +33,7 @@ public class RedisServer{
             System.out.println("Server started on port 6379");
             while(true){
                 Socket clientSocket = serverSocket.accept();
-                clientSocket.setSoTimeout(500);
+                clientSocket.setSoTimeout(100);
                 new Thread(() -> {
                     long threadId = Thread.currentThread().getId();
                     try {
@@ -68,14 +69,21 @@ public class RedisServer{
                     System.out.println("socket timed out Exception!");
                 }
                 String rawCmd = rawCmdBuilder.toString();
-                System.out.println("raw cmd: "+rawCmd);
-                Object  deserializedCmd = respDeserialiser.deserialise(rawCmd);
-                String[] deserializedCmdParts = ((String[]) deserializedCmd);
-                String deserializedCmdStr = deserializedCmdParts[0];
-                RedisCommand redisCommandHandler = handleRedisCommand(deserializedCmdStr);
-                String[] commandArgs = Arrays.copyOfRange(deserializedCmdParts, 1, deserializedCmdParts.length);
-                String output = redisCommandHandler != null ?  redisCommandHandler.execute(commandArgs) : "-Error invalid redis command";
-                out.write(respSerialiser.serialise((Object) output).getBytes());
+                String[] rawSubCmds = rawCmd.split("(\\*)");
+                for(String subCmd : rawSubCmds){
+                    if(subCmd.isEmpty())
+                     continue;
+                    subCmd = "*"+subCmd;
+                    String cmdToPrint = subCmd.replace("\r\n", " ");
+                    System.out.println("raw cmd: "+cmdToPrint);
+                    Object  deserializedCmd = respDeserialiser.deserialise(subCmd);
+                    String[] deserializedCmdParts = ((String[]) deserializedCmd);
+                    String deserializedCmdStr = deserializedCmdParts[0];
+                    RedisCommand redisCommandHandler = handleRedisCommand(deserializedCmdStr);
+                    String[] commandArgs = Arrays.copyOfRange(deserializedCmdParts, 1, deserializedCmdParts.length);
+                    Object output = redisCommandHandler != null ?  redisCommandHandler.execute(commandArgs) : "-Error invalid redis command";
+                    out.write(respSerialiser.serialise(output).getBytes());
+                }
                 out.flush();
                 return;
         }finally{
@@ -92,6 +100,8 @@ public class RedisServer{
             return new SetCommand(redisMap);
         }else if(command.toLowerCase().equals("get")){
             return new GetCommand(redisMap);
+        }else if(command.endsWith("CONFIG")){
+            return new ConfigCommand();
         }
         return null;
     }

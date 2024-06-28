@@ -10,13 +10,18 @@ public class RespSerializer implements RespSerialiser {
 
     @Override
     public String serialise(Object input) {
-        String result;
+        String result = "";
+        System.out.println("----> type: "+input.getClass().getSimpleName());
         switch (input.getClass().getSimpleName()) {
             case "String":
                 result = this.serialiseSimpleString((String) input);
                 break;
             default:
-                throw new IllegalArgumentException("Unsupported input type for serialization");
+                break;
+                //throw new IllegalArgumentException("Unsupported input type for serialization");
+        }
+        if(input.getClass().getSimpleName().equals("String[]")){
+            result = this.serializeArray((String[]) input);
         }
         return result;
     }
@@ -27,6 +32,20 @@ public class RespSerializer implements RespSerialiser {
             return SIMPLE_STRING_PREFIX + input + "\r\n";
         }
         throw new IllegalArgumentException("Input is not a valid RESP Simple String");
+    }
+
+    @Override
+    public String serializeArray(String[] input) {
+        if (input == null || input.length == 0) {
+            return null;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(ARRAY_PREFIX).append(input.length).append("\r\n");
+        for (String element : input) {
+            sb.append(BULK_STRING_PREFIX).append(element.length()).append("\r\n");
+            sb.append(element).append("\r\n");
+        }
+        return sb.toString();
     }
 
 }
