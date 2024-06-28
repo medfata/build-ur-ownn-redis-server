@@ -11,8 +11,12 @@ import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
 import org.buildUrOwn.redisCommandHandler.RedisCommand;
+import org.buildUrOwn.redisCommandHandler.RedisMap;
 import org.buildUrOwn.redisCommandHandler.impl.EchoCommand;
+import org.buildUrOwn.redisCommandHandler.impl.GetCommand;
 import org.buildUrOwn.redisCommandHandler.impl.PingCommand;
+import org.buildUrOwn.redisCommandHandler.impl.RedisKeyValueMap;
+import org.buildUrOwn.redisCommandHandler.impl.SetCommand;
 import org.buildUrOwn.respSerialiser.RespDeserialiser;
 import org.buildUrOwn.respSerialiser.RespSerialiser;
 import org.buildUrOwn.respSerialiser.impl.RespDeserializer;
@@ -20,7 +24,8 @@ import org.buildUrOwn.respSerialiser.impl.RespSerializer;
 
 public class RedisServer{
     private static RespSerialiser respSerialiser = new RespSerializer();
-    private static  RespDeserialiser respDeserialiser = new RespDeserializer();
+    private static RespDeserialiser respDeserialiser = new RespDeserializer();
+    private static RedisMap redisMap = new RedisKeyValueMap();
 
     public static void StartServer(){
         try(ServerSocket serverSocket = new ServerSocket(6379)){
@@ -83,6 +88,10 @@ public class RedisServer{
             return new PingCommand();
         }else if(command.equals("ECHO")){
             return new EchoCommand();
+        }else if(command.toLowerCase().equals("set")){
+            return new SetCommand(redisMap);
+        }else if(command.toLowerCase().equals("get")){
+            return new GetCommand(redisMap);
         }
         return null;
     }
