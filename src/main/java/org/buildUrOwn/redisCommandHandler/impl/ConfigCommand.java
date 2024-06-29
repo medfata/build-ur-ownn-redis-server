@@ -9,13 +9,13 @@ public class ConfigCommand implements RedisCommand {
     @Override
     public Object execute(String[] args) {
         List<String> resp = new ArrayList<>();
-        resp.add(args[0]);
-        switch (args[0]) {
+        resp.add(args[1]);
+        switch (args[1]) {
             case "save":
                 resp.add("900 1 300 10");
                 break;
             case "appendonly":
-                resp.add("yse");
+                resp.add("yes");
             default:
                 break;
         }

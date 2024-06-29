@@ -10,18 +10,14 @@ public class RespSerializer implements RespSerialiser {
 
     @Override
     public String serialise(Object input) {
-        String result = "";
+        String result;
         System.out.println("----> type: "+input.getClass().getSimpleName());
-        switch (input.getClass().getSimpleName()) {
-            case "String":
-                result = this.serialiseSimpleString((String) input);
-                break;
-            default:
-                break;
-                //throw new IllegalArgumentException("Unsupported input type for serialization");
-        }
-        if(input.getClass().getSimpleName().equals("String[]")){
+        if(input instanceof String){
+            result = this.serialiseSimpleString((String) input);
+        }else if(input instanceof String[]){
             result = this.serializeArray((String[]) input);
+        }else{
+            throw new IllegalArgumentException("Unsupported input type for serialization");
         }
         return result;
     }

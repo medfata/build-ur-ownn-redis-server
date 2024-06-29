@@ -12,10 +12,12 @@ import java.util.Arrays;
 
 import org.buildUrOwn.redisCommandHandler.RedisCommand;
 import org.buildUrOwn.redisCommandHandler.RedisMap;
+import org.buildUrOwn.redisCommandHandler.RedisTimestampMap;
 import org.buildUrOwn.redisCommandHandler.impl.ConfigCommand;
 import org.buildUrOwn.redisCommandHandler.impl.EchoCommand;
 import org.buildUrOwn.redisCommandHandler.impl.GetCommand;
 import org.buildUrOwn.redisCommandHandler.impl.PingCommand;
+import org.buildUrOwn.redisCommandHandler.impl.RedisKeyExpireMap;
 import org.buildUrOwn.redisCommandHandler.impl.RedisKeyValueMap;
 import org.buildUrOwn.redisCommandHandler.impl.SetCommand;
 import org.buildUrOwn.respSerialiser.RespDeserialiser;
@@ -24,11 +26,11 @@ import org.buildUrOwn.respSerialiser.impl.RespDeserializer;
 import org.buildUrOwn.respSerialiser.impl.RespSerializer;
 
 public class RedisServer{
-    private static RespSerialiser respSerialiser = new RespSerializer();
-    private static RespDeserialiser respDeserialiser = new RespDeserializer();
-    private static RedisMap redisMap = new RedisKeyValueMap();
-
-    public static void StartServer(){
+    private static final RespSerialiser respSerialiser = new RespSerializer();
+    private static final RespDeserialiser respDeserialiser = new RespDeserializer();
+    private static final RedisMap redisMap = new RedisKeyValueMap();
+    private static final RedisTimestampMap redisTimestampMap = new RedisKeyExpireMap(redisMap);
+    public void StartServer(){
         try(ServerSocket serverSocket = new ServerSocket(6379)){
             System.out.println("Server started on port 6379");
             while(true){
@@ -64,7 +66,7 @@ public class RedisServer{
                 try{
                     while ((line = reader.readLine()) != null) {
                         rawCmdBuilder.append(line).append("\r\n");
-                    }    
+                    }
                 }catch(SocketTimeoutException e){
                     System.out.println("socket timed out Exception!");
                 }
@@ -72,7 +74,7 @@ public class RedisServer{
                 String[] rawSubCmds = rawCmd.split("(\\*)");
                 for(String subCmd : rawSubCmds){
                     if(subCmd.isEmpty())
-                     continue;
+                        continue;
                     subCmd = "*"+subCmd;
                     String cmdToPrint = subCmd.replace("\r\n", " ");
                     System.out.println("raw cmd: "+cmdToPrint);
@@ -85,7 +87,6 @@ public class RedisServer{
                     out.write(respSerialiser.serialise(output).getBytes());
                 }
                 out.flush();
-                return;
         }finally{
             clientSocket.close();
         }
@@ -97,9 +98,9 @@ public class RedisServer{
         }else if(command.equals("ECHO")){
             return new EchoCommand();
         }else if(command.toLowerCase().equals("set")){
-            return new SetCommand(redisMap);
+            return new SetCommand(redisMap, redisTimestampMap);
         }else if(command.toLowerCase().equals("get")){
-            return new GetCommand(redisMap);
+            return new GetCommand(redisMap, redisTimestampMap);
         }else if(command.endsWith("CONFIG")){
             return new ConfigCommand();
         }
