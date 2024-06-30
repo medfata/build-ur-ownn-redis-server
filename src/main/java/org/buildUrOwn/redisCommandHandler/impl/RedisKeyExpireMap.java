@@ -43,6 +43,23 @@ public class RedisKeyExpireMap implements RedisTimestampMap {
         this.map.put(key, futureInstant);
     }
     @Override
+    public void expireKeyWithUnixTime(String key, Long unixTime, String unixTimeUnit) {
+        String valOfKey = this.redisKeyValueMap.get(key);
+        if(unixTime == null || unixTime < 0 ){
+            throw new IllegalArgumentException("unix-time-seconds must be a positive number!");
+        }
+        if(valOfKey == null){
+            throw new IllegalArgumentException(key+" doesn't exist!");
+        }
+        if(unixTimeUnit.equals("seconds")){
+            this.map.put(key, Instant.ofEpochSecond(unixTime));
+        }else if(unixTimeUnit.equals("miliseconds")){
+            this.map.put(key, Instant.ofEpochMilli(unixTime));
+        }else{
+            throw new IllegalArgumentException("unixTimeUnit must be 'seconds' or 'miliseconds'");
+        }
+    }
+    @Override
     public Instant getTimeToExpireByKey(String key) {
         return this.map.get(key);
     }

@@ -9,6 +9,9 @@ public class SetCommand implements RedisCommand {
     public RedisTimestampMap redisTimestampMap;
     private static final String EXPIRE_BY_SECONDS_ARG = "EX";
     private static final String EXPIRE_BY_MILISECONDS_ARG = "PX";
+    private static final String EXPIRE_BY_UNIX_SECONDS_ARG = "EXAT";
+    private static final String EXPIRE_BY_UNIX_MILISECONDS_ARG = "PXAT";
+
     public SetCommand(RedisMap redisMap, RedisTimestampMap redisTimestampMap){
         this.redisMap = redisMap;
         this.redisTimestampMap = redisTimestampMap;
@@ -28,6 +31,12 @@ public class SetCommand implements RedisCommand {
                     break;
                 case EXPIRE_BY_MILISECONDS_ARG:
                     this.redisTimestampMap.expireKeyWithMiliSeconds(key, Long.valueOf(expireTimeVal));
+                    break;
+                case EXPIRE_BY_UNIX_SECONDS_ARG:
+                    this.redisTimestampMap.expireKeyWithUnixTime(key, Long.valueOf(expireTimeVal), "seconds");
+                    break;
+                case EXPIRE_BY_UNIX_MILISECONDS_ARG:
+                    this.redisTimestampMap.expireKeyWithUnixTime(key, Long.valueOf(expireTimeVal), "miliseconds");
                     break;
                 default:
                     throw new UnsupportedOperationException();
