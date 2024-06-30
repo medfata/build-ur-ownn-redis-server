@@ -16,9 +16,9 @@ public class RedisKeyExpireMap implements RedisTimestampMap {
     }
 
     @Override
-    public void expireKeyWithSeconds(String key,int seconds) {
+    public void expireKeyWithSeconds(String key,Long seconds) {
         String valOfKey = this.redisKeyValueMap.get(key);
-        if(seconds < 0 ){
+        if(seconds == null || seconds < 0 ){
             throw new IllegalArgumentException("seconds must be a positive number!");
         }
         if(valOfKey == null){
@@ -26,6 +26,20 @@ public class RedisKeyExpireMap implements RedisTimestampMap {
         }
         Instant currentIntant = Instant.now();
         Instant futureInstant = currentIntant.plusSeconds(seconds);
+        this.map.put(key, futureInstant);
+    }
+
+    @Override
+    public void expireKeyWithMiliSeconds(String key,Long miliSeconds) {
+        String valOfKey = this.redisKeyValueMap.get(key);
+        if(miliSeconds == null || miliSeconds < 0 ){
+            throw new IllegalArgumentException("miliSeconds must be a positive number!");
+        }
+        if(valOfKey == null){
+            throw new IllegalArgumentException(key+" doesn't exist!");
+        }
+        Instant curreInstant = Instant.now();
+        Instant futureInstant = curreInstant.plusMillis(miliSeconds);
         this.map.put(key, futureInstant);
     }
     @Override

@@ -24,10 +24,11 @@ public class SetCommand implements RedisCommand {
             String expireTimeVal = args[3];
             switch (expireTimeUnit) {
                 case EXPIRE_BY_SECONDS_ARG:
-                    this.redisTimestampMap.expireKeyWithSeconds(key, Integer.valueOf(expireTimeVal));
+                    this.redisTimestampMap.expireKeyWithSeconds(key, Long.valueOf(expireTimeVal));
                     break;
                 case EXPIRE_BY_MILISECONDS_ARG:
-                    throw new UnsupportedOperationException();
+                    this.redisTimestampMap.expireKeyWithMiliSeconds(key, Long.valueOf(expireTimeVal));
+                    break;
                 default:
                     throw new UnsupportedOperationException();
             }
