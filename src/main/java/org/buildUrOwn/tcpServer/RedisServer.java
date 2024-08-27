@@ -35,7 +35,7 @@ public class RedisServer{
             System.out.println("Server started on port 6379");
             while(true){
                 Socket clientSocket = serverSocket.accept();
-                clientSocket.setSoTimeout(100);
+                clientSocket.setSoTimeout(1);
                 new Thread(() -> {
                     long threadId = Thread.currentThread().getId();
                     try {
@@ -65,6 +65,7 @@ public class RedisServer{
                 String line;
                 try{
                     while ((line = reader.readLine()) != null) {
+                        long threadId = Thread.currentThread().getId();
                         rawCmdBuilder.append(line).append("\r\n");
                     }
                 }catch(SocketTimeoutException e){
@@ -97,9 +98,9 @@ public class RedisServer{
             return new PingCommand();
         }else if(command.equals("ECHO")){
             return new EchoCommand();
-        }else if(command.toLowerCase().equals("set")){
+        }else if(command.equalsIgnoreCase("set")){
             return new SetCommand(redisMap, redisTimestampMap);
-        }else if(command.toLowerCase().equals("get")){
+        }else if(command.equalsIgnoreCase("get")){
             return new GetCommand(redisMap, redisTimestampMap);
         }else if(command.endsWith("CONFIG")){
             return new ConfigCommand();

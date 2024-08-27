@@ -1,5 +1,7 @@
 package org.buildUrOwn.redisCommandHandler.impl;
 
+import java.util.Random;
+
 import org.buildUrOwn.redisCommandHandler.RedisCommand;
 import org.buildUrOwn.redisCommandHandler.RedisMap;
 import org.buildUrOwn.redisCommandHandler.RedisTimestampMap;
@@ -20,6 +22,11 @@ public class SetCommand implements RedisCommand {
     @Override
     public String execute(String[] args) {
         String key = args[0];
+        if ("__rand_int__".equals(key)) {
+            Random random = new Random();
+            int randomInt = random.nextInt(Integer.MAX_VALUE + 1);
+            key = String.valueOf(randomInt);
+        }
         String value = args[1];
         this.redisMap.put(key, value);
         if(args.length > 2){
