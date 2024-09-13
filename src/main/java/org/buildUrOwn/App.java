@@ -6,6 +6,6 @@ public class App
 {
     public static void main( String[] args )
     {
-        new RedisServer().StartServer();
+        new RedisServer().startServer();
     }
 }
