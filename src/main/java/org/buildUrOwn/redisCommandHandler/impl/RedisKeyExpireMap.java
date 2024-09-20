@@ -63,4 +63,10 @@ public class RedisKeyExpireMap implements RedisTimestampMap {
     public Instant getTimeToExpireByKey(String key) {
         return this.map.get(key);
     }
+
+    @Override
+    public void removeKey(String key) {
+        this.map.remove(key);
+        this.redisKeyValueMap.remove(key);
+    }
 }

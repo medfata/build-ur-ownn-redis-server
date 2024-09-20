@@ -7,4 +7,5 @@ public interface RedisTimestampMap {
     public void expireKeyWithMiliSeconds(String key, Long miliSeconds);
     public void expireKeyWithUnixTime(String key, Long unixTimeSec, String unixTimeUnit);
     public Instant getTimeToExpireByKey(String key);
+    public void removeKey(String key);
 }

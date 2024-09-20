@@ -14,8 +14,10 @@ public class RespSerializer implements RespSerialiser {
         System.out.println("----> type: "+input.getClass().getSimpleName());
         if(input instanceof String){
             result = this.serialiseSimpleString((String) input);
-        }else if(input instanceof String[]){
+        }else if(input instanceof String[]) {
             result = this.serializeArray((String[]) input);
+        }else if(input instanceof  Integer){
+            result = this.serialiseInteger((Integer) input);
         }else{
             throw new IllegalArgumentException("Unsupported input type for serialization");
         }
@@ -24,10 +26,14 @@ public class RespSerializer implements RespSerialiser {
 
     @Override
     public String serialiseSimpleString(String input) {
-        if (input instanceof String) {
+        if (input != null) {
             return SIMPLE_STRING_PREFIX + input + "\r\n";
         }
         throw new IllegalArgumentException("Input is not a valid RESP Simple String");
+    }
+    @Override
+    public String serialiseInteger(Integer input) {
+        return ":" + input + "\r\n";
     }
 
     @Override

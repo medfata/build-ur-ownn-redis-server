@@ -12,10 +12,12 @@ public class KeyExistsCommands implements RedisCommand {
         this.redisTimestampMap = redisTimestampMap;
     }
     @Override
-    public String execute(String[] args) {
+    public Integer execute(String[] args) {
         Instant keyExpTimestamp = this.redisTimestampMap.getTimeToExpireByKey(args[0]);
-        if(keyExpTimestamp != null && Instant.now().isAfter(keyExpTimestamp))
-            return "0";
-        return "1";
+        if(keyExpTimestamp == null)
+            return 0;
+        if(Instant.now().isAfter(keyExpTimestamp))
+            return 0;
+        return 1;
     }
 }
