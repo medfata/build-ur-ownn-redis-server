@@ -129,6 +129,8 @@ public class RedisServer{
             return new ConfigCommand();
         }else if (command.endsWith("EXISTS")){
             return new KeyExistsCommands(redisTimestampMap);
+        }else if(command.equalsIgnoreCase("del")){
+            return new DeleteCommand(redisMap, redisTimestampMap);
         }
         return null;
     }
