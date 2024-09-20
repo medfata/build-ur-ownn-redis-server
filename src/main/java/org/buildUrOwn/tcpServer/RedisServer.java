@@ -21,13 +21,7 @@ import java.util.Set;
 import org.buildUrOwn.redisCommandHandler.RedisCommand;
 import org.buildUrOwn.redisCommandHandler.RedisMap;
 import org.buildUrOwn.redisCommandHandler.RedisTimestampMap;
-import org.buildUrOwn.redisCommandHandler.impl.ConfigCommand;
-import org.buildUrOwn.redisCommandHandler.impl.EchoCommand;
-import org.buildUrOwn.redisCommandHandler.impl.GetCommand;
-import org.buildUrOwn.redisCommandHandler.impl.PingCommand;
-import org.buildUrOwn.redisCommandHandler.impl.RedisKeyExpireMap;
-import org.buildUrOwn.redisCommandHandler.impl.RedisKeyValueMap;
-import org.buildUrOwn.redisCommandHandler.impl.SetCommand;
+import org.buildUrOwn.redisCommandHandler.impl.*;
 import org.buildUrOwn.respSerialiser.RespDeserialiser;
 import org.buildUrOwn.respSerialiser.RespSerialiser;
 import org.buildUrOwn.respSerialiser.impl.RespDeserializer;
@@ -133,6 +127,8 @@ public class RedisServer{
             return new GetCommand(redisMap, redisTimestampMap);
         }else if(command.endsWith("CONFIG")){
             return new ConfigCommand();
+        }else if (command.endsWith("EXISTS")){
+            return new KeyExistsCommands(redisTimestampMap);
         }
         return null;
     }

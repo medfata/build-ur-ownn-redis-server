@@ -53,10 +53,10 @@ public class RedisKeyExpireMap implements RedisTimestampMap {
         }
         if(unixTimeUnit.equals("seconds")){
             this.map.put(key, Instant.ofEpochSecond(unixTime));
-        }else if(unixTimeUnit.equals("miliseconds")){
+        }else if(unixTimeUnit.equals("milliseconds")){
             this.map.put(key, Instant.ofEpochMilli(unixTime));
         }else{
-            throw new IllegalArgumentException("unixTimeUnit must be 'seconds' or 'miliseconds'");
+            throw new IllegalArgumentException("unixTimeUnit must be 'seconds' or 'milliseconds'");
         }
     }
     @Override

@@ -43,7 +43,7 @@ public class SetCommand implements RedisCommand {
                     this.redisTimestampMap.expireKeyWithUnixTime(key, Long.valueOf(expireTimeVal), "seconds");
                     break;
                 case EXPIRE_BY_UNIX_MILISECONDS_ARG:
-                    this.redisTimestampMap.expireKeyWithUnixTime(key, Long.valueOf(expireTimeVal), "miliseconds");
+                    this.redisTimestampMap.expireKeyWithUnixTime(key, Long.valueOf(expireTimeVal), "milliseconds");
                     break;
                 default:
                     throw new UnsupportedOperationException();
