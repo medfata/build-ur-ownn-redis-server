@@ -131,6 +131,8 @@ public class RedisServer{
             return new KeyExistsCommands(redisTimestampMap);
         }else if(command.equalsIgnoreCase("del")){
             return new DeleteCommand(redisMap, redisTimestampMap);
+        }else if(command.equalsIgnoreCase("incr")){
+            return new IncrementCommand(redisMap, redisTimestampMap);
         }
         return null;
     }
