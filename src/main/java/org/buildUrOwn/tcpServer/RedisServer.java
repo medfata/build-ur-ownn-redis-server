@@ -14,9 +14,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import org.buildUrOwn.redisCommandHandler.RedisCommand;
 import org.buildUrOwn.redisCommandHandler.RedisMap;
@@ -32,6 +30,19 @@ public class RedisServer{
     private static final RespDeserialiser respDeserialiser = new RespDeserializer();
     private static final RedisMap redisMap = new RedisKeyValueMap();
     private static final RedisTimestampMap redisTimestampMap = new RedisKeyExpireMap(redisMap);
+    private static final Map<String, RedisCommand> redisCommandMap;
+    static {
+        redisCommandMap = new HashMap<>();
+        redisCommandMap.put("PING", new PingCommand());
+        redisCommandMap.put("ECHO", new EchoCommand());
+        redisCommandMap.put("SET", new SetCommand(redisMap, redisTimestampMap));
+        redisCommandMap.put("GET", new GetCommand(redisMap, redisTimestampMap));
+        redisCommandMap.put("CONFIG", new ConfigCommand());
+        redisCommandMap.put("EXISTS", new KeyExistsCommands(redisTimestampMap));
+        redisCommandMap.put("DEL", new DeleteCommand(redisMap, redisTimestampMap));
+        redisCommandMap.put("INCR", new IncrementCommand(redisMap, redisTimestampMap));
+        redisCommandMap.put("DECR", new DecrementCommand(redisMap, redisTimestampMap));
+    }
     private void handleAccept(SelectionKey key) throws IOException {
         ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
         SocketChannel clientChannel = serverSocketChannel.accept();
@@ -117,24 +128,7 @@ public class RedisServer{
     }
 
     private static RedisCommand handleRedisCommand(String command){
-        if(command.equals("PING")){
-            return new PingCommand();
-        }else if(command.equals("ECHO")){
-            return new EchoCommand();
-        }else if(command.equalsIgnoreCase("set")){
-            return new SetCommand(redisMap, redisTimestampMap);
-        }else if(command.equalsIgnoreCase("get")){
-            return new GetCommand(redisMap, redisTimestampMap);
-        }else if(command.endsWith("CONFIG")){
-            return new ConfigCommand();
-        }else if (command.endsWith("EXISTS")){
-            return new KeyExistsCommands(redisTimestampMap);
-        }else if(command.equalsIgnoreCase("del")){
-            return new DeleteCommand(redisMap, redisTimestampMap);
-        }else if(command.equalsIgnoreCase("incr")){
-            return new IncrementCommand(redisMap, redisTimestampMap);
-        }
-        return null;
+        return redisCommandMap.get(command);
     }
     
 }
